@@ -1,16 +1,7 @@
 {
-  "last_updated": "2025-08-04T18:42:06.665Z",
   "anime": [
     {
-      "id": "contoh-anime",
-      "title": "Contoh Anime",
-      "genres": [
-        "Action"
-      ],
-      "status": "ongoing"
-    },
-    {
-      "id": "anime-1754332924615",
+      "id": "anime-1754333125067",
       "title": "Judul Anime Baru",
       "genres": [
         "Action"
@@ -19,27 +10,7 @@
       "current_episode": 1,
       "total_episodes": 12,
       "thumbnail": "",
-      "vip_only": false,
-      "episodes": [
-        {
-          "number": 1,
-          "title": "Episode 1",
-          "video_url": "",
-          "mirrors": []
-        }
-      ]
-    },
-    {
-      "id": "anime-1754332925446",
-      "title": "Judul Anime Baru",
-      "genres": [
-        "Action"
-      ],
-      "status": "ongoing",
-      "current_episode": 1,
-      "total_episodes": 12,
-      "thumbnail": "",
-      "vip_only": false,
+      "vip_only": true,
       "episodes": [
         {
           "number": 1,
@@ -49,5 +20,6 @@
         }
       ]
     }
-  ]
+  ],
+  "last_updated": "2025-08-04T18:45:42.639Z"
 }
