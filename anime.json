@@ -79,7 +79,147 @@
           "mirrors": []
         }
       ]
+    },
+    {
+      "id": "anime-1754333687509",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333687657",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333687841",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333687992",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333688273",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333688592",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
+    },
+    {
+      "id": "anime-1754333688775",
+      "title": "Judul Anime Baru",
+      "genres": [
+        "Action"
+      ],
+      "status": "ongoing",
+      "current_episode": 1,
+      "total_episodes": 12,
+      "thumbnail": "",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Episode 1",
+          "video_url": "",
+          "mirrors": []
+        }
+      ]
     }
   ],
-  "last_updated": "2025-08-04T18:54:39.581Z"
+  "last_updated": "2025-08-04T18:54:49.304Z"
 }
