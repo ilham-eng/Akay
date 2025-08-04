@@ -1,1 +1,43 @@
-
+{
+  "last_updated": "2023-11-20T12:00:00Z",
+  "anime": [
+    {
+      "id": "naruto-shippuden",
+      "title": "Naruto Shippuden",
+      "genres": ["Action", "Adventure", "Fantasy"],
+      "status": "completed",
+      "current_episode": 500,
+      "total_episodes": 500,
+      "thumbnail": "https://img1.ak.crunchyroll.com/i/spire4/7e9c32ad2e5f15346f7b9cda5d5c6c861655400611_full.jpg",
+      "vip_only": false,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Homecoming",
+          "video_url": "https://example.com/videos/naruto-shippuden-1.mp4",
+          "mirrors": [
+            "https://mirror.example.com/naruto-shippuden-1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jujutsu-kaisen",
+      "title": "Jujutsu Kaisen",
+      "genres": ["Action", "Supernatural", "Horror"],
+      "status": "ongoing",
+      "current_episode": 42,
+      "total_episodes": null,
+      "thumbnail": "https://img1.ak.crunchyroll.com/i/spire1/4c1a0a6f6a0e6b5b5b5b5b5b5b5b5b5b1655400611_full.jpg",
+      "vip_only": true,
+      "episodes": [
+        {
+          "number": 1,
+          "title": "Ryomen Sukuna",
+          "video_url": "https://example.com/videos/jujutsu-kaisen-1.mp4",
+          "mirrors": []
+        }
+      ]
+    }
+  ]
+    }
