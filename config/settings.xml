@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <settings>
-    <setting name="exampleSetting" value="exampleValue" />
+    <difficulty>normal</difficulty>
+    <sound>true</sound>
+    <language>en</language>
 </settings>
