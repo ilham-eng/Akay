@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<github-config>
+    <repository>
+        <username>ilham-eng</username>
+        <repo-name>Akay</repo-name>
+        <branch>main</branch>
+        <base-url>https://raw.githubusercontent.com/ilham-eng/Akay/main/</base-url>
+    </repository>
+    
+    <game-files>
+        <file type="layout" name="main_menu" path="layouts/main_menu.xml" />
+        <file type="layout" name="game_ui" path="layouts/game_ui.xml" />
+        <file type="code" name="MainActivity" path="src/MainActivity.java" />
+        <file type="code" name="GameEngine" path="src/GameEngine.java" />
+        <file type="character" name="player" path="characters/player.xml" />
+        <file type="config" name="settings" path="config/settings.xml" />
+    </game-files>
+    
+    <settings>
+        <cache-enabled>true</cache-enabled>
+        <cache-duration>3600</cache-duration>
+        <version>1.0.0</version>
+    </settings>
+</github-config>
