@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<character>
+    <name>Player</name>
+    <health>100</health>
+    <speed>10</speed>
+</character>
