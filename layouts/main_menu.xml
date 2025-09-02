@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu>
+    <title>Akay Game</title>
+    <button id="start">Start Game</button>
+    <button id="settings">Settings</button>
+    <button id="exit">Exit</button>
+</menu>
