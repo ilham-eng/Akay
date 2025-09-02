@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui>
+    <score id="scoreLabel">Score: 0</score>
+    <health id="healthLabel">Health: 100</health>
+    <button id="pause">Pause</button>
+</ui>
