@@ -1,4 +1,4 @@
-name: Build Cordova APK
+name: Build Cordova APK with Cache
 on: [push]
 jobs:
   build-android:
@@ -12,19 +12,33 @@ jobs:
       with:
         node-version: '18'
     
+    - name: Cache Cordova and Android
+      uses: actions/cache@v3
+      id: cache
+      with:
+        path: |
+          ~/.npm
+          ~/.cordova
+          ~/.android
+          ~/.gradle
+        key: ${{ runner.os }}-android-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-android-
+    
     - name: Install Cordova
       run: npm install -g cordova
     
-    - name: Build APK Instead of AAB
+    - name: Create and build APK
       run: |
         cordova create myapp com.example.myapp MyApp
         cd myapp
         cordova platform add android
-        # Build debug untuk dapat APK
-        cordova build android --debug
+        
+        # Force APK build instead of AAB
+        cordova build android -- --packageType=apk
     
-    - name: Upload APK File
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: android-apk
-        path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        name: android-release-apk
+        path: myapp/platforms/android/app/build/outputs/apk/release/*.apk
