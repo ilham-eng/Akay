@@ -1,4 +1,4 @@
-name: Build Cordova Debug APK
+name: Build Cordova APK
 on: [push]
 jobs:
   build-android:
@@ -15,15 +15,16 @@ jobs:
     - name: Install Cordova
       run: npm install -g cordova
     
-    - name: Build Debug APK
+    - name: Build APK Instead of AAB
       run: |
         cordova create myapp com.example.myapp MyApp
         cd myapp
         cordova platform add android
-        cordova build android  # Debug mode (default menghasilkan APK)
+        # Build debug untuk dapat APK
+        cordova build android --debug
     
-    - name: Upload Debug APK
+    - name: Upload APK File
       uses: actions/upload-artifact@v4
       with:
-        name: android-debug-apk
-        path: myapp/platforms/android/app/build/outputs/apk/debug/*.apk
+        name: android-apk
+        path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
