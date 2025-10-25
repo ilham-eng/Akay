@@ -1,4 +1,4 @@
-name: Build Cordova App
+name: Build Three.js Game
 on: [push]
 jobs:
   build-android:
@@ -11,25 +11,71 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
     
     - name: Install Cordova
       run: npm install -g cordova
     
-    - name: Create and build Cordova project
+    - name: Create Three.js Game Structure
       run: |
-        cordova create myapp com.example.myapp MyApp
-        cd myapp
+        cordova create three-game com.example.threegame "3D Game"
+        cd three-game
+        
+        # Create Three.js game structure
+        cat > www/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>3D Game</title>
+            <style>
+                body { margin: 0; padding: 0; overflow: hidden; }
+                canvas { display: block; }
+            </style>
+        </head>
+        <body>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+            <script src="js/game.js"></script>
+        </body>
+        </html>
+        EOF
+        
+        mkdir -p www/js
+        cat > www/js/game.js << 'EOF'
+        // Three.js Game
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+        
+        camera.position.z = 5;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+        EOF
+        
         cordova platform add android
-        cordova build android --release
-        # Debug: lihat struktur folder
-        find . -name "*.apk" -type f
-        ls -la platforms/android/app/build/outputs/apk/
-        ls -la platforms/android/app/build/outputs/
     
-    - name: Upload all APKs (catch-all)
+    - name: Build Game APK
+      run: |
+        cd three-game
+        cordova build android --debug
+    
+    - name: Upload 3D Game
       uses: actions/upload-artifact@v4
       with:
-        name: android-apks
-        path: |
-          myapp/platforms/android/app/build/outputs/**/*.apk
-          myapp/platforms/android/build/outputs/**/*.apk
+        name: threejs-game
+        path: three-game/platforms/android/app/build/outputs/apk/debug/app-debug.apk
