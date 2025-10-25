@@ -7,24 +7,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Setup Node.js without cache
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        # HILANGKAN cache: 'npm' untuk menghindari error
     
     - name: Install Cordova
       run: npm install -g cordova
     
-    - name: Build Cordova App
+    - name: Create and build Cordova project
       run: |
-        cordova create build-folder com.example.app MyApp
-        cd build-folder
+        cordova create myapp com.example.myapp MyApp
+        cd myapp
         cordova platform add android
         cordova build android --release
+        # Debug: lihat struktur folder
+        find . -name "*.apk" -type f
+        ls -la platforms/android/app/build/outputs/apk/
+        ls -la platforms/android/app/build/outputs/
     
-    - name: Upload APK
+    - name: Upload all APKs (catch-all)
       uses: actions/upload-artifact@v4
       with:
-        name: app-release
-        path: build-folder/platforms/android/app/build/outputs/apk/release/
+        name: android-apks
+        path: |
+          myapp/platforms/android/app/build/outputs/**/*.apk
+          myapp/platforms/android/build/outputs/**/*.apk
