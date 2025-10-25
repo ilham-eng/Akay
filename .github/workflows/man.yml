@@ -1,0 +1,29 @@
+name: Build Cordova Debug APK
+on: [push]
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Cordova
+      run: npm install -g cordova
+    
+    - name: Build Debug APK
+      run: |
+        cordova create myapp com.example.myapp MyApp
+        cd myapp
+        cordova platform add android
+        cordova build android  # Debug mode (default menghasilkan APK)
+    
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-debug-apk
+        path: myapp/platforms/android/app/build/outputs/apk/debug/*.apk
