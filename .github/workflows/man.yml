@@ -1,4 +1,4 @@
-name: Build Cordova APK with Cache
+name: Build Cordova APK
 on: [push]
 jobs:
   build-android:
@@ -11,30 +11,44 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    
-    - name: Cache Cordova and Android
-      uses: actions/cache@v3
-      id: cache
-      with:
-        path: |
-          ~/.npm
-          ~/.cordova
-          ~/.android
-          ~/.gradle
-        key: ${{ runner.os }}-android-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-android-
+        cache: 'npm'
+        cache-dependency-path: |
+          myapp/package-lock.json
+          package-lock.json
     
     - name: Install Cordova
       run: npm install -g cordova
     
-    - name: Create and build APK
+    - name: Create Cordova project
       run: |
         cordova create myapp com.example.myapp MyApp
         cd myapp
+        # Buat package.json untuk cache
+        npm init -y
         cordova platform add android
-        
-        # Force APK build instead of AAB
+    
+    - name: Save cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.npm
+          ~/.cordova
+          myapp/platforms/android/.gradle
+          myapp/node_modules
+        key: ${{ runner.os }}-cordova-${{ hashFiles('myapp/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-cordova-
+    
+    - name: Build APK (not AAB)
+      run: |
+        cd myapp
+        cordova build android --release -- --packageType=apk
+    
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: myapp/platforms/android/app/build/outputs/apk/release/app-release.apk        # Force APK build instead of AAB
         cordova build android -- --packageType=apk
     
     - name: Upload APK artifact
