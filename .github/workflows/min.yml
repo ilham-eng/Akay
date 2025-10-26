@@ -20,8 +20,19 @@ jobs:
         cordova create my3dgame com.example.my3dgame "3D Space Game"
         cd my3dgame
         
-        # Create the HTML file using a separate script
-        cat > create_game.html << 'EOF'
+        # Create base64 encoded GitHub logo (simple SVG)
+        cat > logo.svg << 'EOF'
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M48 0C21.5 0 0 21.5 0 48C0 69.5 9.5 87.8 22.6 96C24.3 96.3 25.2 95.2 25.2 94.3C25.2 93.4 25.2 89.8 25.2 85.7C25.2 82.2 23.8 80.5 23.1 79.8C28.5 78.8 30.7 76.6 31.5 75.3C32.1 74.1 33.3 72 35.2 71.2C36.8 70.5 38.8 68.8 38.8 61.7C38.8 57.5 37.5 54.3 35.8 52.2C36.3 51.5 37.1 49.3 37.1 45.6C37.1 42.8 36.5 40.8 35.4 39.3C39.8 39.3 43.9 41.1 46.3 44.2C47.5 44.2 48.8 43.8 50.3 43.3C51.8 42.8 53.3 42.5 54.7 42.5C56.1 42.5 57.6 42.8 59.1 43.3C60.6 43.8 61.9 44.2 63.1 44.2C65.5 41.1 69.6 39.3 74 39.3C72.9 40.8 72.3 42.8 72.3 45.6C72.3 49.3 73.1 51.5 73.6 52.2C71.9 54.3 70.6 57.5 70.6 61.7C70.6 68.8 72.6 70.5 74.2 71.2C76.1 72 77.3 74.1 77.9 75.3C78.7 76.6 80.9 78.8 86.3 79.8C87.6 80.5 88.2 81.8 88.2 83.7C88.2 86.8 88.2 89.3 88.2 94.3C88.2 95.2 89.1 96.3 90.8 96C103.9 87.8 113.5 69.5 113.5 48C113.5 21.5 91.5 0 48 0Z" fill="white"/>
+</svg>
+EOF
+
+        # Convert SVG to base64
+        LOGO_BASE64=$(base64 -w 0 logo.svg)
+        GITHUB_LOGO="data:image/svg+xml;base64,$LOGO_BASE64"
+        
+        # Create the HTML file
+        cat > www/index.html << 'EOF'
 <!DOCTYPE html>
 <html>
 <head>
@@ -55,25 +66,8 @@ jobs:
         .github-logo {
             width: 120px;
             height: 120px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             margin-bottom: 30px;
             animation: pulse 2s infinite;
-        }
-        
-        .github-logo::before {
-            content: "";
-            width: 80px;
-            height: 80px;
-            background: 
-                radial-gradient(circle at 30% 30%, #000 8%, transparent 8%),
-                radial-gradient(circle at 70% 30%, #000 8%, transparent 8%),
-                linear-gradient(#000 40%, transparent 40%);
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
         }
         
         #loadingText {
@@ -93,11 +87,6 @@ jobs:
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
-        }
-        
-        #startButton:hover {
-            background: #2ea043;
-            transform: translateY(-2px);
         }
         
         #gameContainer {
@@ -162,24 +151,18 @@ jobs:
             font-size: 20px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .restart-button:hover {
-            background: #2ea043;
-            transform: scale(1.05);
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
     <div id="splashScreen">
-        <div class="github-logo"></div>
+        <img class="github-logo" src="$GITHUB_LOGO" alt="GitHub Logo">
         <div id="loadingText">3D Space Game<br><small>Powered by GitHub</small></div>
         <button id="startButton">Launch Game</button>
     </div>
@@ -189,12 +172,11 @@ jobs:
         <div id="ui">
             <div>Score: <span id="score">0</span></div>
             <div>Lives: <span id="lives">3</span></div>
-            <div>Level: <span id="level">1</span></div>
         </div>
         <div id="gameOverScreen">
-            <div class="game-over-title">MISSION FAILED</div>
-            <div class="game-over-score">Final Score: <span id="finalScore">0</span></div>
-            <button class="restart-button">Try Again</button>
+            <div class="game-over-title">GAME OVER</div>
+            <div class="game-over-score">Score: <span id="finalScore">0</span></div>
+            <button class="restart-button">Play Again</button>
         </div>
     </div>
 
@@ -203,20 +185,11 @@ jobs:
         const gameState = {
             score: 0,
             lives: 3,
-            level: 1,
             gameOver: false,
-            player: {
-                x: 0,
-                y: 0,
-                size: 25,
-                speed: 8,
-                color: '#58a6ff'
-            },
+            player: { x: 0, y: 0, size: 25, speed: 8, color: '#58a6ff' },
             enemies: [],
             particles: [],
-            stars: [],
-            lastEnemySpawn: 0,
-            enemySpawnRate: 2000
+            stars: []
         };
 
         // DOM Elements
@@ -236,7 +209,6 @@ jobs:
             gameLoop();
         }
 
-        // Setup Canvas
         function setupCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -244,18 +216,14 @@ jobs:
             gameState.player.y = canvas.height - 100;
         }
 
-        // Setup Event Listeners
         function setupEventListeners() {
             startButton.addEventListener('click', startGame);
             restartButton.addEventListener('click', restartGame);
             canvas.addEventListener('touchmove', handleTouchMove);
-            canvas.addEventListener('touchstart', handleTouchStart);
             canvas.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('keydown', handleKeyDown);
             window.addEventListener('resize', handleResize);
         }
 
-        // Start Game
         function startGame() {
             splashScreen.style.opacity = '0';
             setTimeout(() => {
@@ -265,105 +233,68 @@ jobs:
             }, 500);
         }
 
-        // Reset Game State
         function resetGame() {
             gameState.score = 0;
             gameState.lives = 3;
-            gameState.level = 1;
             gameState.gameOver = false;
             gameState.enemies = [];
             gameState.particles = [];
             gameState.stars = [];
-            gameState.lastEnemySpawn = Date.now();
-            
             gameState.player.x = canvas.width / 2;
-            gameState.player.y = canvas.height - 100;
-            
             updateUI();
             createStars();
             gameOverScreen.style.display = 'none';
         }
 
-        // Restart Game
         function restartGame() {
             resetGame();
             gameLoop();
         }
 
-        // Create Background Stars
         function createStars() {
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < 100; i++) {
                 gameState.stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     size: Math.random() * 2 + 0.5,
-                    speed: Math.random() * 3 + 1,
-                    brightness: Math.random() * 0.8 + 0.2
+                    speed: Math.random() * 2 + 0.5
                 });
             }
         }
 
-        // Create Enemy
         function createEnemy() {
-            const size = Math.random() * 25 + 20;
-            const speed = Math.random() * 2 + 1 + gameState.level * 0.5;
-            
+            const size = Math.random() * 30 + 20;
             gameState.enemies.push({
                 x: Math.random() * (canvas.width - size),
                 y: -size,
                 size: size,
-                speed: speed,
-                color: `hsl(${Math.random() * 60}, 80%, 50%)`,
-                rotation: Math.random() * Math.PI * 2,
-                rotationSpeed: (Math.random() - 0.5) * 0.1
+                speed: Math.random() * 3 + 1,
+                color: `hsl(${Math.random() * 60}, 100%, 50%)`,
+                rotation: 0,
+                rotationSpeed: (Math.random() - 0.5) * 0.05
             });
         }
 
-        // Create Particles
         function createParticles(x, y, color, count) {
             for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 3 + 1;
-                
                 gameState.particles.push({
-                    x: x,
-                    y: y,
-                    size: Math.random() * 4 + 2,
-                    speedX: Math.cos(angle) * speed,
-                    speedY: Math.sin(angle) * speed,
+                    x: x, y: y,
+                    size: Math.random() * 3 + 1,
+                    speedX: Math.random() * 4 - 2,
+                    speedY: Math.random() * 4 - 2,
                     color: color,
-                    life: 30,
-                    decay: Math.random() * 0.1 + 0.05
+                    life: 20
                 });
             }
         }
 
-        // Update Game State
         function update() {
             if (gameState.gameOver) return;
-
-            const currentTime = Date.now();
-            
-            // Spawn enemies
-            if (currentTime - gameState.lastEnemySpawn > gameState.enemySpawnRate) {
-                createEnemy();
-                gameState.lastEnemySpawn = currentTime;
-                
-                // Increase difficulty
-                if (gameState.score > gameState.level * 1000) {
-                    gameState.level++;
-                    gameState.enemySpawnRate = Math.max(500, 2000 - gameState.level * 200);
-                    updateUI();
-                }
-            }
 
             // Update stars
             gameState.stars.forEach(star => {
                 star.y += star.speed;
-                if (star.y > canvas.height) {
-                    star.y = 0;
-                    star.x = Math.random() * canvas.width;
-                }
+                if (star.y > canvas.height) star.y = 0;
             });
 
             // Update enemies
@@ -372,23 +303,20 @@ jobs:
                 enemy.rotation += enemy.rotationSpeed;
 
                 // Collision detection
-                const dx = enemy.x + enemy.size / 2 - gameState.player.x;
-                const dy = enemy.y + enemy.size / 2 - gameState.player.y;
+                const dx = enemy.x + enemy.size/2 - gameState.player.x;
+                const dy = enemy.y + enemy.size/2 - gameState.player.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance < enemy.size / 2 + gameState.player.size / 2) {
-                    createParticles(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2, '#ff6b6b', 15);
+                if (distance < enemy.size/2 + gameState.player.size/2) {
+                    createParticles(enemy.x + enemy.size/2, enemy.y + enemy.size/2, '#ff6b6b', 10);
                     gameState.enemies.splice(index, 1);
                     gameState.lives--;
                     updateUI();
-
-                    if (gameState.lives <= 0) {
-                        gameOver();
-                    }
+                    if (gameState.lives <= 0) gameOver();
                 }
-                else if (enemy.y > canvas.height + enemy.size) {
+                else if (enemy.y > canvas.height) {
                     gameState.enemies.splice(index, 1);
-                    gameState.score += 50;
+                    gameState.score += 10;
                     updateUI();
                 }
             });
@@ -397,40 +325,60 @@ jobs:
             gameState.particles.forEach((particle, index) => {
                 particle.x += particle.speedX;
                 particle.y += particle.speedY;
-                particle.life -= particle.decay;
-                particle.size *= 0.95;
-
-                if (particle.life <= 0) {
-                    gameState.particles.splice(index, 1);
-                }
+                particle.life--;
+                if (particle.life <= 0) gameState.particles.splice(index, 1);
             });
+
+            // Create new enemies
+            if (Math.random() < 0.02) createEnemy();
         }
 
-        // Draw Game
         function draw() {
+            // Clear canvas
             ctx.fillStyle = '#0d1117';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            drawStars();
-            drawParticles();
-            drawEnemies();
-            drawPlayer();
-        }
-
-        // Draw Stars
-        function drawStars() {
+            // Draw stars
+            ctx.fillStyle = 'white';
             gameState.stars.forEach(star => {
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
             });
-        }
 
-        // Draw Player
-        function drawPlayer() {
+            // Draw particles
+            gameState.particles.forEach(particle => {
+                ctx.save();
+                ctx.globalAlpha = particle.life / 20;
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Draw enemies
+            gameState.enemies.forEach(enemy => {
+                ctx.save();
+                ctx.translate(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
+                ctx.rotate(enemy.rotation);
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2;
+                    const radius = enemy.size/2 * (0.8 + Math.sin(angle * 3) * 0.2);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Draw player
             const p = gameState.player;
-            
             ctx.fillStyle = p.color;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y - p.size);
@@ -439,118 +387,42 @@ jobs:
             ctx.closePath();
             ctx.fill();
 
-            ctx.fillStyle = '#c9d1d9';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y - p.size / 3, p.size / 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            const gradient = ctx.createRadialGradient(
-                p.x, p.y + p.size, 0,
-                p.x, p.y + p.size, p.size
-            );
-            gradient.addColorStop(0, '#ffd700');
-            gradient.addColorStop(0.5, '#ff6b6b');
-            gradient.addColorStop(1, 'transparent');
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y + p.size, p.size / 2, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Draw Enemies
-        function drawEnemies() {
-            gameState.enemies.forEach(enemy => {
-                ctx.save();
-                ctx.translate(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
-                ctx.rotate(enemy.rotation);
-
-                ctx.fillStyle = enemy.color;
-                ctx.beginPath();
-                for (let i = 0; i < 8; i++) {
-                    const angle = (i / 8) * Math.PI * 2;
-                    const radius = enemy.size / 2 * (0.7 + Math.sin(angle * 5) * 0.3);
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * radius;
-                    
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-                ctx.beginPath();
-                ctx.arc(-enemy.size / 4, -enemy.size / 6, enemy.size / 8, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
-            });
-        }
-
-        // Draw Particles
-        function drawParticles() {
-            gameState.particles.forEach(particle => {
-                ctx.save();
-                ctx.globalAlpha = particle.life / 30;
-                ctx.fillStyle = particle.color;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-        }
-
-        // Game Over
-        function gameOver() {
-            gameState.gameOver = true;
-            document.getElementById('finalScore').textContent = gameState.score;
-            gameOverScreen.style.display = 'flex';
-        }
-
-        // Update UI
-        function updateUI() {
-            document.getElementById('score').textContent = gameState.score;
-            document.getElementById('lives').textContent = gameState.lives;
-            document.getElementById('level').textContent = gameState.level;
-        }
-
-        // Game Loop
-        function gameLoop() {
-            update();
-            draw();
-            if (!gameState.gameOver) {
-                requestAnimationFrame(gameLoop);
+            // Game over screen
+            if (gameState.gameOver) {
+                gameOverScreen.style.display = 'flex';
             }
         }
 
-        // Event Handlers
+        function gameOver() {
+            gameState.gameOver = true;
+            document.getElementById('finalScore').textContent = gameState.score;
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('lives').textContent = gameState.lives;
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            if (!gameState.gameOver) requestAnimationFrame(gameLoop);
+        }
+
         function handleTouchMove(e) {
             e.preventDefault();
             if (gameState.gameOver) return;
-            
             const touch = e.touches[0];
             const rect = canvas.getBoundingClientRect();
             gameState.player.x = touch.clientX - rect.left;
             clampPlayerPosition();
         }
 
-        function handleTouchStart(e) {
-            e.preventDefault();
-        }
-
         function handleMouseMove(e) {
             if (gameState.gameOver) return;
-            
             const rect = canvas.getBoundingClientRect();
             gameState.player.x = e.clientX - rect.left;
             clampPlayerPosition();
-        }
-
-        function handleKeyDown(e) {
-            if (gameState.gameOver && e.key === ' ') {
-                restartGame();
-            }
         }
 
         function handleResize() {
@@ -566,9 +438,7 @@ jobs:
 </html>
 EOF
 
-        # Move the created HTML to the www directory
-        mv create_game.html www/index.html
-        echo "✅ 3D Game HTML created successfully!"
+        echo "✅ 3D Game created successfully!"
     
     - name: Build 3D Game APK
       run: |
