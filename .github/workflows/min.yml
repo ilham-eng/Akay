@@ -1,4 +1,4 @@
-name: Cordova 
+name: Build 3D HTML5 Game
 on: [push]
 jobs:
   build-android:
@@ -20,9 +20,8 @@ jobs:
         cordova create my3dgame com.example.my3dgame "3D Space Game"
         cd my3dgame
         
-        # Create the HTML file using echo commands
-        mkdir -p www
-        cat > www/index.html << 'EOFHTML'
+        # Create the HTML file using a separate script
+        cat > create_game.html << 'EOF'
 <!DOCTYPE html>
 <html>
 <head>
@@ -176,12 +175,6 @@ jobs:
             50% { transform: scale(1.1); opacity: 1; }
             100% { transform: scale(1); opacity: 0.8; }
         }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
     </style>
 </head>
 <body>
@@ -223,7 +216,7 @@ jobs:
             particles: [],
             stars: [],
             lastEnemySpawn: 0,
-            enemySpawnRate: 2000 // 2 seconds
+            enemySpawnRate: 2000
         };
 
         // DOM Elements
@@ -253,24 +246,12 @@ jobs:
 
         // Setup Event Listeners
         function setupEventListeners() {
-            // Start button
             startButton.addEventListener('click', startGame);
-            
-            // Restart button
             restartButton.addEventListener('click', restartGame);
-            
-            // Touch controls
             canvas.addEventListener('touchmove', handleTouchMove);
             canvas.addEventListener('touchstart', handleTouchStart);
-            
-            // Mouse controls
             canvas.addEventListener('mousemove', handleMouseMove);
-            canvas.addEventListener('click', handleClick);
-            
-            // Keyboard controls
             document.addEventListener('keydown', handleKeyDown);
-            
-            // Window resize
             window.addEventListener('resize', handleResize);
         }
 
@@ -306,6 +287,7 @@ jobs:
         // Restart Game
         function restartGame() {
             resetGame();
+            gameLoop();
         }
 
         // Create Background Stars
@@ -395,7 +377,6 @@ jobs:
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < enemy.size / 2 + gameState.player.size / 2) {
-                    // Collision
                     createParticles(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2, '#ff6b6b', 15);
                     gameState.enemies.splice(index, 1);
                     gameState.lives--;
@@ -405,7 +386,6 @@ jobs:
                         gameOver();
                     }
                 }
-                // Remove off-screen enemies
                 else if (enemy.y > canvas.height + enemy.size) {
                     gameState.enemies.splice(index, 1);
                     gameState.score += 50;
@@ -428,7 +408,6 @@ jobs:
 
         // Draw Game
         function draw() {
-            // Clear canvas with space background
             ctx.fillStyle = '#0d1117';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -452,7 +431,6 @@ jobs:
         function drawPlayer() {
             const p = gameState.player;
             
-            // Ship body (triangle)
             ctx.fillStyle = p.color;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y - p.size);
@@ -461,13 +439,11 @@ jobs:
             ctx.closePath();
             ctx.fill();
 
-            // Cockpit
             ctx.fillStyle = '#c9d1d9';
             ctx.beginPath();
             ctx.arc(p.x, p.y - p.size / 3, p.size / 3, 0, Math.PI * 2);
             ctx.fill();
 
-            // Engine glow
             const gradient = ctx.createRadialGradient(
                 p.x, p.y + p.size, 0,
                 p.x, p.y + p.size, p.size
@@ -489,7 +465,6 @@ jobs:
                 ctx.translate(enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
                 ctx.rotate(enemy.rotation);
 
-                // Asteroid body
                 ctx.fillStyle = enemy.color;
                 ctx.beginPath();
                 for (let i = 0; i < 8; i++) {
@@ -504,7 +479,6 @@ jobs:
                 ctx.closePath();
                 ctx.fill();
 
-                // Asteroid details
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.beginPath();
                 ctx.arc(-enemy.size / 4, -enemy.size / 6, enemy.size / 8, 0, Math.PI * 2);
@@ -573,20 +547,6 @@ jobs:
             clampPlayerPosition();
         }
 
-        function handleClick(e) {
-            if (gameState.gameOver) {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // Simple button collision check
-                if (x >= canvas.width/2 - 50 && x <= canvas.width/2 + 50 &&
-                    y >= canvas.height/2 + 50 && y <= canvas.height/2 + 100) {
-                    restartGame();
-                }
-            }
-        }
-
         function handleKeyDown(e) {
             if (gameState.gameOver && e.key === ' ') {
                 restartGame();
@@ -597,7 +557,6 @@ jobs:
             setupCanvas();
         }
 
-        // Utility Functions
         function clampPlayerPosition() {
             const halfSize = gameState.player.size;
             gameState.player.x = Math.max(halfSize, Math.min(canvas.width - halfSize, gameState.player.x));
@@ -605,8 +564,10 @@ jobs:
     </script>
 </body>
 </html>
-EOFHTML
+EOF
 
+        # Move the created HTML to the www directory
+        mv create_game.html www/index.html
         echo "✅ 3D Game HTML created successfully!"
     
     - name: Build 3D Game APK
